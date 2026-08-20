@@ -84,12 +84,14 @@ struct vector
 	};
 
 	template <OtherVector T>
-	[[nodiscard]] constexpr operator T() const noexcept
+	[[nodiscard]] constexpr
+	operator T() const noexcept
 	{ return {x, y, z}; };
 
 	// vec + other
 	template <OtherVector T>
-	[[nodiscard]] constexpr friend vector operator+(vector lhs, const T &rhs) noexcept
+	[[nodiscard]] constexpr friend vector
+	operator+(vector lhs, const T &rhs) noexcept
 	{
 		return {
 			static_cast<X>(lhs.x + rhs.x),
@@ -99,7 +101,8 @@ struct vector
 	}
 	// other + vec
 	template <OtherVector T>
-	[[nodiscard]] constexpr friend T operator+(T lhs, const vector &rhs) noexcept
+	[[nodiscard]] constexpr friend T
+	operator+(T lhs, const vector &rhs) noexcept
 	{
 		return {
 			static_cast<std::remove_cvref_t<decltype(lhs.x)>>(lhs.x + rhs.x),
@@ -108,14 +111,16 @@ struct vector
 		};
 	}
 	// vec + vec
-	[[nodiscard]] constexpr friend vector operator+(vector lhs, const vector &rhs) noexcept
+	[[nodiscard]] constexpr friend vector
+	operator+(vector lhs, const vector &rhs) noexcept
 	{
 		return {lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z};
 	}
 	// vec + diff vec
 	template <Number X2, Number Y2, Number Z2>
 		requires(!std::same_as<vector<X2, Y2, Z2>, vector>)
-	[[nodiscard]] constexpr friend vector<X2, Y2, Z2> operator+(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept
+	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>
+	operator+(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept
 	{
 		return {
 			static_cast<X2>(lhs.x + rhs.x),
@@ -126,7 +131,8 @@ struct vector
 
 	// += other
 	template <OtherVector T>
-	[[nodiscard]] constexpr vector &operator+=(const T &v) noexcept
+	[[nodiscard]] constexpr vector &
+	operator+=(const T &v) noexcept
 	{
 		this->x += v.x;
 		this->y += v.y;
@@ -135,7 +141,8 @@ struct vector
 		return *this;
 	}
 	// += vec
-	[[nodiscard]] constexpr friend vector &operator+=(vector &lhs, const vector &rhs) noexcept
+	[[nodiscard]] constexpr friend vector &
+	operator+=(vector &lhs, const vector &rhs) noexcept
 	{
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
@@ -146,7 +153,8 @@ struct vector
 	// += diff vec
 	template <Number X2, Number Y2, Number Z2>
 		requires(!std::same_as<vector<X2, Y2, Z2>, vector>)
-	[[nodiscard]] constexpr friend vector<X2, Y2, Z2> operator+=(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept
+	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>
+	operator+=(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept
 	{
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
@@ -162,7 +170,8 @@ struct vector
 
 // other += vec
 template <OtherVector T, Number X, Number Y, Number Z>
-[[nodiscard]] constexpr T &operator+=(T &lhs, const vector<X, Y, Z> &rhs) noexcept
+[[nodiscard]] constexpr T &
+operator+=(T &lhs, const vector<X, Y, Z> &rhs) noexcept
 {
 	lhs.x += rhs.x;
 	lhs.y += rhs.y;
