@@ -5,8 +5,7 @@ namespace xvec {
 
 // MARK: concepts
 
-// integral or floating point
-// NOTE: includes bool and char types
+// integral or floating point (includes bool and char types)
 template <typename T>
 concept Number =
 	std::integral<std::remove_cvref_t<T>> || std::floating_point<std::remove_cvref_t<T>>;
@@ -138,14 +137,20 @@ struct vector
 
 	// constructors
 	[[nodiscard]] constexpr vector() noexcept = default;
-	[[nodiscard]] constexpr vector(X x, Y y, Z z) noexcept : x(x), y(y), z(z) {};
+	[[nodiscard]] constexpr vector(X x, Y y, Z z) noexcept : x(x), y(y), z(z) {}
 	template <Number T>
-	[[nodiscard]] constexpr vector(T n) noexcept : x(n), y(n), z(n) {};
+	[[nodiscard]] constexpr vector(T n) noexcept : x(n), y(n), z(n)
+	{
+	}
 
 	template <VectorLike T>
-	[[nodiscard]] constexpr vector(const T &v) noexcept : x(v.x), y(v.y), z(v.z) {};
+	[[nodiscard]] constexpr vector(const T &v) noexcept : x(v.x), y(v.y), z(v.z)
+	{
+	}
 	template <VectorLike T>
-	[[nodiscard]] constexpr vector(T &&v) noexcept : x(v.x), y(v.y), z(v.z) {};
+	[[nodiscard]] constexpr vector(T &&v) noexcept : x(v.x), y(v.y), z(v.z)
+	{
+	}
 
 	// MARK: methods
 
@@ -157,7 +162,7 @@ struct vector
 		z = v.z;
 
 		return *this;
-	};
+	}
 	template <VectorLike T>
 	constexpr vector &operator=(T &&v) noexcept
 	{
@@ -166,12 +171,12 @@ struct vector
 		z = v.z;
 
 		return *this;
-	};
+	}
 
 	template <OtherVector T>
 	[[nodiscard]] constexpr
 	operator T() const noexcept
-	{ return {x, y, z}; };
+	{ return {x, y, z}; }
 
 	VEC_DEFINE_ARITHMETIC_OPERATORS(+, +=)
 	VEC_DEFINE_ARITHMETIC_OPERATORS(-, -=)
