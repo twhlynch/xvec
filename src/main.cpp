@@ -76,5 +76,13 @@ int main()
 	is_same<vec::vector<int, int, int>>(vector_int = vector_complex);
 	is_same<CustomVector<int>>(custom_int = vector_int);
 
+	constexpr vec::vector cv1 {1, 2, 3};
+	constexpr vec::vector cv2 {4, 5, 6};
+	constexpr CustomVector cc1 {1, 2, 3};
+	[[maybe_unused]] constexpr auto cv3 = cv1 + cv2;
+	[[maybe_unused]] constexpr auto cv4 = cv1 + cc1;
+	[[maybe_unused]] constexpr auto cv5 = static_cast<CustomVector<int>>(cv1);
+	[[maybe_unused]] constexpr auto cv6 = cc1 + cv1;
+
 	return EXIT_SUCCESS;
 }
