@@ -1,4 +1,4 @@
-# vector
+# xvec
 
 C++ 3D vector class designed to be interoperable with other library
 implementations.

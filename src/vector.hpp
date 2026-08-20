@@ -1,7 +1,7 @@
 #include <concepts>
 #include <type_traits>
 
-namespace vec {
+namespace xvec {
 
 // MARK: concepts
 
@@ -215,4 +215,4 @@ vector(T &&v) -> vector<
 	std::remove_cvref_t<decltype(v.y)>,
 	std::remove_cvref_t<decltype(v.z)>>;
 
-} // namespace vec
+} // namespace xvec
