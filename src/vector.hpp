@@ -42,6 +42,91 @@ concept Vector = is_vector<std::remove_cvref_t<T>>::value;
 template <typename T>
 concept OtherVector = !Vector<T> && VectorLike<T>;
 
+// MARK: operators macro
+
+// vec OP other, other OP vec, vec OP vec, vec OP diff vec, vec COMPOUND other,
+// vec COMPOUND vec, vec COMPOUND diff vec, other COMPOUND vec
+#define VEC_DEFINE_ARITHMETIC_OPERATORS(OP, COMPOUND)                          \
+                                                                               \
+	/* vec OP other */                                                         \
+	template <OtherVector T>                                                   \
+	[[nodiscard]] constexpr friend vector                                      \
+	operator OP(vector lhs, const T &rhs) noexcept                             \
+	{                                                                          \
+		return {                                                               \
+			static_cast<X>(lhs.x OP rhs.x),                                    \
+			static_cast<Y>(lhs.y OP rhs.y),                                    \
+			static_cast<Z>(lhs.z OP rhs.z),                                    \
+		};                                                                     \
+	}                                                                          \
+                                                                               \
+	/* other OP vec */                                                         \
+	template <OtherVector T>                                                   \
+	[[nodiscard]] constexpr friend T                                           \
+	operator OP(T lhs, const vector &rhs) noexcept                             \
+	{                                                                          \
+		return {                                                               \
+			static_cast<std::remove_cvref_t<decltype(lhs.x)>>(lhs.x OP rhs.x), \
+			static_cast<std::remove_cvref_t<decltype(lhs.y)>>(lhs.y OP rhs.y), \
+			static_cast<std::remove_cvref_t<decltype(lhs.z)>>(lhs.z OP rhs.z), \
+		};                                                                     \
+	}                                                                          \
+                                                                               \
+	/* vec OP vec (same) */                                                    \
+	[[nodiscard]] constexpr friend vector                                      \
+	operator OP(vector lhs, const vector &rhs) noexcept                        \
+	{                                                                          \
+		return {lhs.x OP rhs.x, lhs.y OP rhs.y, lhs.z OP rhs.z};               \
+	}                                                                          \
+                                                                               \
+	/* vec OP diff vec */                                                      \
+	template <Number X2, Number Y2, Number Z2>                                 \
+	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>                          \
+	operator OP(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept            \
+	{                                                                          \
+		return {                                                               \
+			static_cast<X2>(lhs.x OP rhs.x),                                   \
+			static_cast<Y2>(lhs.y OP rhs.y),                                   \
+			static_cast<Z2>(lhs.z OP rhs.z),                                   \
+		};                                                                     \
+	}                                                                          \
+                                                                               \
+	/* vec COMPOUND other */                                                   \
+	template <OtherVector T>                                                   \
+	[[nodiscard]] constexpr vector &                                           \
+	operator COMPOUND(const T &v) noexcept                                     \
+	{                                                                          \
+		this->x COMPOUND v.x;                                                  \
+		this->y COMPOUND v.y;                                                  \
+		this->z COMPOUND v.z;                                                  \
+		return *this;                                                          \
+	}                                                                          \
+                                                                               \
+	/* vec COMPOUND vec (same) */                                              \
+	[[nodiscard]] constexpr friend vector &                                    \
+	operator COMPOUND(vector &lhs, const vector &rhs) noexcept                 \
+	{                                                                          \
+		lhs.x COMPOUND rhs.x;                                                  \
+		lhs.y COMPOUND rhs.y;                                                  \
+		lhs.z COMPOUND rhs.z;                                                  \
+		return lhs;                                                            \
+	}                                                                          \
+                                                                               \
+	/* vec COMPOUND diff vec */                                                \
+	template <Number X2, Number Y2, Number Z2>                                 \
+	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>                          \
+	operator COMPOUND(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept     \
+	{                                                                          \
+		lhs.x COMPOUND rhs.x;                                                  \
+		lhs.y COMPOUND rhs.y;                                                  \
+		lhs.z COMPOUND rhs.z;                                                  \
+		return {                                                               \
+			static_cast<X2>(lhs.x),                                            \
+			static_cast<Y2>(lhs.y),                                            \
+			static_cast<Z2>(lhs.z)                                             \
+		};                                                                     \
+	}
+
 // MARK: class
 
 template <Number X, Number Y, Number Z>
@@ -88,95 +173,33 @@ struct vector
 	operator T() const noexcept
 	{ return {x, y, z}; };
 
-	// vec + other
-	template <OtherVector T>
-	[[nodiscard]] constexpr friend vector
-	operator+(vector lhs, const T &rhs) noexcept
-	{
-		return {
-			static_cast<X>(lhs.x + rhs.x),
-			static_cast<Y>(lhs.y + rhs.y),
-			static_cast<Z>(lhs.z + rhs.z),
-		};
-	}
-	// other + vec
-	template <OtherVector T>
-	[[nodiscard]] constexpr friend T
-	operator+(T lhs, const vector &rhs) noexcept
-	{
-		return {
-			static_cast<std::remove_cvref_t<decltype(lhs.x)>>(lhs.x + rhs.x),
-			static_cast<std::remove_cvref_t<decltype(lhs.y)>>(lhs.y + rhs.y),
-			static_cast<std::remove_cvref_t<decltype(lhs.z)>>(lhs.z + rhs.z),
-		};
-	}
-	// vec + vec
-	[[nodiscard]] constexpr friend vector
-	operator+(vector lhs, const vector &rhs) noexcept
-	{
-		return {lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z};
-	}
-	// vec + diff vec
-	template <Number X2, Number Y2, Number Z2>
-	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>
-	operator+(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept
-	{
-		return {
-			static_cast<X2>(lhs.x + rhs.x),
-			static_cast<Y2>(lhs.y + rhs.y),
-			static_cast<Z2>(lhs.z + rhs.z),
-		};
-	}
-
-	// += other
-	template <OtherVector T>
-	[[nodiscard]] constexpr vector &
-	operator+=(const T &v) noexcept
-	{
-		this->x += v.x;
-		this->y += v.y;
-		this->z += v.z;
-
-		return *this;
-	}
-	// += vec
-	[[nodiscard]] constexpr friend vector &
-	operator+=(vector &lhs, const vector &rhs) noexcept
-	{
-		lhs.x += rhs.x;
-		lhs.y += rhs.y;
-		lhs.z += rhs.z;
-
-		return lhs;
-	}
-	// += diff vec
-	template <Number X2, Number Y2, Number Z2>
-	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>
-	operator+=(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept
-	{
-		lhs.x += rhs.x;
-		lhs.y += rhs.y;
-		lhs.z += rhs.z;
-
-		return {
-			static_cast<X2>(lhs.x),
-			static_cast<Y2>(lhs.y),
-			static_cast<Z2>(lhs.z)
-		};
-	}
+	VEC_DEFINE_ARITHMETIC_OPERATORS(+, +=)
+	VEC_DEFINE_ARITHMETIC_OPERATORS(-, -=)
+	VEC_DEFINE_ARITHMETIC_OPERATORS(*, *=)
+	VEC_DEFINE_ARITHMETIC_OPERATORS(/, /=)
 };
 
-// other += vec
-template <OtherVector T, Number X, Number Y, Number Z>
-[[nodiscard]] constexpr T &
-operator+=(T &lhs, const vector<X, Y, Z> &rhs) noexcept
-{
-	lhs.x += rhs.x;
-	lhs.y += rhs.y;
-	lhs.z += rhs.z;
+#undef VEC_DEFINE_ARITHMETIC_OPERATORS
 
-	return lhs;
-}
+// MARK: other COMPOUND vec
+
+#define VEC_DEFINE_OTHER_COMPOUND(COMPOUND)                        \
+	template <OtherVector T, Number X, Number Y, Number Z>         \
+	[[nodiscard]] constexpr T &                                    \
+	operator COMPOUND(T &lhs, const vector<X, Y, Z> &rhs) noexcept \
+	{                                                              \
+		lhs.x COMPOUND rhs.x;                                      \
+		lhs.y COMPOUND rhs.y;                                      \
+		lhs.z COMPOUND rhs.z;                                      \
+		return lhs;                                                \
+	}
+
+VEC_DEFINE_OTHER_COMPOUND(+=)
+VEC_DEFINE_OTHER_COMPOUND(-=)
+VEC_DEFINE_OTHER_COMPOUND(*=)
+VEC_DEFINE_OTHER_COMPOUND(/=)
+
+#undef VEC_DEFINE_OTHER_COMPOUND
 
 // MARK: deductions
 
