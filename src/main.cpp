@@ -20,9 +20,9 @@ static void is_same(Actual &&_)
 int main()
 {
 	vec::vector vector_int {1, 2, 3};
-	CustomVector custom_int {1, 2, 3};
+	CustomVector custom_int {.x = 1, .y = 2, .z = 3};
 	vec::vector vector_float {1.0f, 2.0f, 3.0f};
-	CustomVector custom_float {1.0f, 2.0f, 3.0f};
+	CustomVector custom_float {.x = 1.0f, .y = 2.0f, .z = 3.0f};
 	vec::vector vector_complex {1, 2.0f, 3.0};
 
 	is_same<vec::vector<int, int, int>>(vector_int + custom_int);
@@ -56,8 +56,8 @@ int main()
 	is_same<vec::vector<float, float, float>>(vec::vector {vector_float});
 	is_same<vec::vector<int, int, int>>(vec::vector {custom_int});
 	is_same<vec::vector<float, float, float>>(vec::vector {custom_float});
-	is_same<vec::vector<int, int, int>>(vec::vector {std::move(custom_int)});
-	is_same<vec::vector<float, float, float>>(vec::vector {std::move(custom_float)});
+	is_same<vec::vector<int, int, int>>(vec::vector {std::move(custom_int)});		  // NOLINT(performance-move-const-arg)
+	is_same<vec::vector<float, float, float>>(vec::vector {std::move(custom_float)}); // NOLINT(performance-move-const-arg)
 
 	vec::vector _1 = vector_int;
 	is_same<vec::vector<int, int, int>>(_1);
@@ -67,9 +67,9 @@ int main()
 	is_same<vec::vector<int, int, int>>(_3);
 	vec::vector _4 = custom_float;
 	is_same<vec::vector<float, float, float>>(_4);
-	vec::vector _5 = std::move(custom_int);
+	vec::vector _5 = std::move(custom_int); // NOLINT(performance-move-const-arg)
 	is_same<vec::vector<int, int, int>>(_5);
-	vec::vector _6 = std::move(custom_float);
+	vec::vector _6 = std::move(custom_float); // NOLINT(performance-move-const-arg)
 	is_same<vec::vector<float, float, float>>(_6);
 
 	is_same<vec::vector<int, int, int>>(vector_int = vector_float);
@@ -78,7 +78,7 @@ int main()
 
 	constexpr vec::vector cv1 {1, 2, 3};
 	constexpr vec::vector cv2 {4, 5, 6};
-	constexpr CustomVector cc1 {1, 2, 3};
+	constexpr CustomVector cc1 {.x = 1, .y = 2, .z = 3};
 	[[maybe_unused]] constexpr auto cv3 = cv1 + cv2;
 	[[maybe_unused]] constexpr auto cv4 = cv1 + cc1;
 	[[maybe_unused]] constexpr auto cv5 = static_cast<CustomVector<int>>(cv1);
