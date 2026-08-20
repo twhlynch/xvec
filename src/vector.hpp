@@ -185,7 +185,7 @@ struct vector
 
 #define VEC_DEFINE_OTHER_COMPOUND(COMPOUND)                        \
 	template <OtherVector T, Number X, Number Y, Number Z>         \
-	[[nodiscard]] constexpr T &                                    \
+	[[nodiscard]] constexpr auto &                                 \
 	operator COMPOUND(T &lhs, const vector<X, Y, Z> &rhs) noexcept \
 	{                                                              \
 		lhs.x COMPOUND rhs.x;                                      \
