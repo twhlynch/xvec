@@ -118,7 +118,6 @@ struct vector
 	}
 	// vec + diff vec
 	template <Number X2, Number Y2, Number Z2>
-		requires(!std::same_as<vector<X2, Y2, Z2>, vector>)
 	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>
 	operator+(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept
 	{
@@ -152,7 +151,6 @@ struct vector
 	}
 	// += diff vec
 	template <Number X2, Number Y2, Number Z2>
-		requires(!std::same_as<vector<X2, Y2, Z2>, vector>)
 	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>
 	operator+=(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept
 	{
