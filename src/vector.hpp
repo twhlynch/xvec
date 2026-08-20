@@ -12,7 +12,7 @@ concept Number =
 	std::integral<std::remove_cvref_t<T>> || std::floating_point<std::remove_cvref_t<T>>;
 
 template <typename T>
-concept VectorLike = requires(T vec) {
+concept VectorLike = requires(const T vec) {
 	// x, y, and z are numbers
 	{ vec.x } -> Number;
 	{ vec.y } -> Number;
@@ -52,20 +52,20 @@ struct vector
 	Z z;
 
 	// constructors
-	vector() = default;
-	vector(X x, Y y, Z z) : x(x), y(y), z(z) {};
+	[[nodiscard]] constexpr vector() noexcept = default;
+	[[nodiscard]] constexpr vector(X x, Y y, Z z) noexcept : x(x), y(y), z(z) {};
 	template <Number T>
-	vector(T n) : x(n), y(n), z(n) {};
+	[[nodiscard]] constexpr vector(T n) noexcept : x(n), y(n), z(n) {};
 
 	template <VectorLike T>
-	vector(const T &v) : x(v.x), y(v.y), z(v.z) {};
+	[[nodiscard]] constexpr vector(const T &v) noexcept : x(v.x), y(v.y), z(v.z) {};
 	template <VectorLike T>
-	vector(T &&v) : x(v.x), y(v.y), z(v.z) {};
+	[[nodiscard]] constexpr vector(T &&v) noexcept : x(v.x), y(v.y), z(v.z) {};
 
 	// MARK: methods
 
 	template <VectorLike T>
-	vector &operator=(const T &v)
+	constexpr vector &operator=(const T &v) noexcept
 	{
 		x = v.x;
 		y = v.y;
@@ -74,7 +74,7 @@ struct vector
 		return *this;
 	};
 	template <VectorLike T>
-	vector &operator=(T &&v)
+	constexpr vector &operator=(T &&v) noexcept
 	{
 		x = v.x;
 		y = v.y;
@@ -84,12 +84,12 @@ struct vector
 	};
 
 	template <OtherVector T>
-	operator T() const
+	[[nodiscard]] constexpr operator T() const noexcept
 	{ return {x, y, z}; };
 
 	// vec + other
 	template <OtherVector T>
-	friend vector operator+(vector lhs, const T &rhs)
+	[[nodiscard]] constexpr friend vector operator+(vector lhs, const T &rhs) noexcept
 	{
 		return {
 			static_cast<X>(lhs.x + rhs.x),
@@ -99,7 +99,7 @@ struct vector
 	}
 	// other + vec
 	template <OtherVector T>
-	friend T operator+(T lhs, const vector &rhs)
+	[[nodiscard]] constexpr friend T operator+(T lhs, const vector &rhs) noexcept
 	{
 		return {
 			static_cast<std::remove_cvref_t<decltype(lhs.x)>>(lhs.x + rhs.x),
@@ -108,14 +108,14 @@ struct vector
 		};
 	}
 	// vec + vec
-	friend vector operator+(vector lhs, const vector &rhs)
+	[[nodiscard]] constexpr friend vector operator+(vector lhs, const vector &rhs) noexcept
 	{
 		return {lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z};
 	}
 	// vec + diff vec
 	template <Number X2, Number Y2, Number Z2>
 		requires(!std::same_as<vector<X2, Y2, Z2>, vector>)
-	friend vector<X2, Y2, Z2> operator+(vector lhs, const vector<X2, Y2, Z2> &rhs)
+	[[nodiscard]] constexpr friend vector<X2, Y2, Z2> operator+(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept
 	{
 		return {
 			static_cast<X2>(lhs.x + rhs.x),
@@ -126,7 +126,7 @@ struct vector
 
 	// += other
 	template <OtherVector T>
-	vector &operator+=(const T &v)
+	[[nodiscard]] constexpr vector &operator+=(const T &v) noexcept
 	{
 		this->x += v.x;
 		this->y += v.y;
@@ -135,7 +135,7 @@ struct vector
 		return *this;
 	}
 	// += vec
-	friend vector &operator+=(vector &lhs, const vector &rhs)
+	[[nodiscard]] constexpr friend vector &operator+=(vector &lhs, const vector &rhs) noexcept
 	{
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
@@ -146,7 +146,7 @@ struct vector
 	// += diff vec
 	template <Number X2, Number Y2, Number Z2>
 		requires(!std::same_as<vector<X2, Y2, Z2>, vector>)
-	friend vector<X2, Y2, Z2> operator+=(vector &lhs, const vector<X2, Y2, Z2> &rhs)
+	[[nodiscard]] constexpr friend vector<X2, Y2, Z2> operator+=(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept
 	{
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
@@ -162,7 +162,7 @@ struct vector
 
 // other += vec
 template <OtherVector T, Number X, Number Y, Number Z>
-T &operator+=(T &lhs, const vector<X, Y, Z> &rhs)
+[[nodiscard]] constexpr T &operator+=(T &lhs, const vector<X, Y, Z> &rhs) noexcept
 {
 	lhs.x += rhs.x;
 	lhs.y += rhs.y;
