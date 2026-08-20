@@ -39,6 +39,9 @@ struct is_vector<vector<X, Y, Z>> : std::true_type
 template <typename T>
 concept Vector = is_vector<std::remove_cvref_t<T>>::value;
 
+template <typename T>
+concept OtherVector = !Vector<T> && VectorLike<T>;
+
 // MARK: class
 
 template <Number X, Number Y, Number Z>
@@ -80,14 +83,12 @@ struct vector
 		return *this;
 	};
 
-	template <VectorLike T>
-		requires(!Vector<T>)
+	template <OtherVector T>
 	operator T() const
 	{ return {x, y, z}; };
 
 	// vec + other
-	template <VectorLike T>
-		requires(!Vector<T>)
+	template <OtherVector T>
 	friend vector operator+(vector lhs, const T &rhs)
 	{
 		return {
@@ -97,8 +98,7 @@ struct vector
 		};
 	}
 	// other + vec
-	template <VectorLike T>
-		requires(!Vector<T>)
+	template <OtherVector T>
 	friend T operator+(T lhs, const vector &rhs)
 	{
 		return {
@@ -125,8 +125,7 @@ struct vector
 	}
 
 	// += other
-	template <VectorLike T>
-		requires(!Vector<T>)
+	template <OtherVector T>
 	vector &operator+=(const T &v)
 	{
 		this->x += v.x;
@@ -162,8 +161,7 @@ struct vector
 };
 
 // other += vec
-template <VectorLike T, Number X, Number Y, Number Z>
-	requires(!Vector<T>)
+template <OtherVector T, Number X, Number Y, Number Z>
 T &operator+=(T &lhs, const vector<X, Y, Z> &rhs)
 {
 	lhs.x += rhs.x;
