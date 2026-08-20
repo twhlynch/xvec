@@ -142,29 +142,15 @@ struct vector
 	[[nodiscard]] constexpr vector(T n) noexcept : x(n), y(n), z(n)
 	{
 	}
-
 	template <VectorLike T>
-	[[nodiscard]] constexpr vector(const T &v) noexcept : x(v.x), y(v.y), z(v.z)
-	{
-	}
-	template <VectorLike T>
-	[[nodiscard]] constexpr vector(T &&v) noexcept : x(v.x), y(v.y), z(v.z)
+	[[nodiscard]] constexpr vector(T v) noexcept : x(v.x), y(v.y), z(v.z)
 	{
 	}
 
 	// MARK: methods
 
 	template <VectorLike T>
-	constexpr vector &operator=(const T &v) noexcept
-	{
-		x = v.x;
-		y = v.y;
-		z = v.z;
-
-		return *this;
-	}
-	template <VectorLike T>
-	constexpr vector &operator=(T &&v) noexcept
+	constexpr vector &operator=(T v) noexcept
 	{
 		x = v.x;
 		y = v.y;
