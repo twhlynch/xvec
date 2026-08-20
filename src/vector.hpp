@@ -131,9 +131,9 @@ concept OtherVector = !Vector<T> && VectorLike<T>;
 template <Number X, Number Y, Number Z>
 struct vector
 {
-	X x;
-	Y y;
-	Z z;
+	X x {};
+	Y y {};
+	Z z {};
 
 	// constructors
 	[[nodiscard]] constexpr vector() noexcept = default;
