@@ -20,25 +20,15 @@ concept VectorLike = requires(const T vec) {
 	{ vec.z } -> Number;
 };
 
-// MARK: is_vector
-
 // forward declare to use here
 template <Number X, Number Y, Number Z>
 struct vector;
 
-// is_vector is false for all types except vector
-template <typename>
-struct is_vector : std::false_type
-{
-};
-template <Number X, Number Y, Number Z>
-struct is_vector<vector<X, Y, Z>> : std::true_type
-{
-};
-
-// a Vector is specifically this vector class
+// a Vector is this vector class or any type deriving from it
 template <typename T>
-concept Vector = is_vector<std::remove_cvref_t<T>>::value;
+concept Vector = requires(std::remove_cvref_t<T> t) {
+	[]<Number X, Number Y, Number Z>(const vector<X, Y, Z> &) {}(t);
+};
 
 template <typename T>
 concept OtherVector = !Vector<T> && VectorLike<T>;

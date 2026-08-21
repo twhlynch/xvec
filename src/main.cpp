@@ -1,6 +1,5 @@
 #include <cmath>
 #include <cstdlib>
-#include <type_traits>
 
 #include "tests.hpp"
 #include "vector.hpp"
@@ -8,16 +7,6 @@
 // simple 3D vector with some math member functions inheriting from
 // xvec::vector provides construction, arithmetic, and comparison with every
 // other vector like type for free
-
-struct Vec3;
-
-// registering Vec3 in xvec::is_vector ensures overload resolution is
-// unambiguous
-
-template <>
-struct xvec::is_vector<Vec3> : std::true_type
-{
-};
 
 struct Vec3 : xvec::vector<float, float, float>
 {

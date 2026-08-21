@@ -14,13 +14,6 @@ struct CustomVector
 	T z;
 };
 
-struct Derived;
-
-template <>
-struct xvec::is_vector<Derived> : std::true_type
-{
-};
-
 struct Derived : xvec::vector<float, float, float>
 {
 	using xvec::vector<float, float, float>::vector;

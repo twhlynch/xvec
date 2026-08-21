@@ -8,11 +8,6 @@ implementations.
 ```cpp
 #include "vector.hpp"
 
-struct Vector3D;
-
-template <>
-struct xvec::is_vector<Derived> : std::true_type {};
-
 struct Vector3D : xvec::vector<float, float, float>
 {
 	using xvec::vector<float, float, float>::vector;
