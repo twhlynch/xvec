@@ -92,7 +92,7 @@ concept OtherVector = !Vector<T> && VectorLike<T>;
                                                                                \
 	/* vec COMPOUND other */                                                   \
 	template <OtherVector T>                                                   \
-	[[nodiscard]] constexpr vector &                                           \
+	constexpr vector &                                                         \
 	operator COMPOUND(const T &v) noexcept                                     \
 	{                                                                          \
 		this->x COMPOUND v.x;                                                  \
@@ -102,7 +102,7 @@ concept OtherVector = !Vector<T> && VectorLike<T>;
 	}                                                                          \
                                                                                \
 	/* vec COMPOUND vec (same) */                                              \
-	[[nodiscard]] constexpr friend vector &                                    \
+	constexpr friend vector &                                                  \
 	operator COMPOUND(vector &lhs, const vector &rhs) noexcept                 \
 	{                                                                          \
 		lhs.x COMPOUND rhs.x;                                                  \
@@ -113,7 +113,7 @@ concept OtherVector = !Vector<T> && VectorLike<T>;
                                                                                \
 	/* vec COMPOUND diff vec */                                                \
 	template <Number X2, Number Y2, Number Z2>                                 \
-	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>                          \
+	constexpr friend vector<X2, Y2, Z2>                                        \
 	operator COMPOUND(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept     \
 	{                                                                          \
 		lhs.x COMPOUND rhs.x;                                                  \
@@ -224,7 +224,7 @@ struct vector
 
 #define VEC_DEFINE_OTHER_COMPOUND(COMPOUND)                        \
 	template <OtherVector T, Number X, Number Y, Number Z>         \
-	[[nodiscard]] constexpr auto &                                 \
+	constexpr auto &                                               \
 	operator COMPOUND(T &lhs, const vector<X, Y, Z> &rhs) noexcept \
 	{                                                              \
 		lhs.x COMPOUND rhs.x;                                      \
