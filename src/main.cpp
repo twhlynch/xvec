@@ -8,9 +8,15 @@
 // xvec::vector provides construction, arithmetic, and comparison with every
 // other vector like type for free
 
-struct Vec3 : xvec::vector<float, float, float>
+template <xvec::Number X, xvec::Number Y, xvec::Number Z>
+struct Vec3 : xvec::vector<X, Y, Z>
 {
-	using xvec::vector<float, float, float>::vector;
+	// dependent bases are not searched by unqualified lookup so bring the
+	// components into scope manually
+	using xvec::vector<X, Y, Z>::vector;
+	using xvec::vector<X, Y, Z>::x;
+	using xvec::vector<X, Y, Z>::y;
+	using xvec::vector<X, Y, Z>::z;
 
 	[[nodiscard]] constexpr auto dot(const Vec3 &rhs) const noexcept
 	{ return (x * rhs.x) + (y * rhs.y) + (z * rhs.z); }
@@ -27,6 +33,10 @@ struct Vec3 : xvec::vector<float, float, float>
 	normalized() const noexcept
 	{ return *this / length(); }
 };
+
+// deduction guides do not carry over from the base class sadly
+template <xvec::Number X, xvec::Number Y, xvec::Number Z>
+Vec3(X, Y, Z) -> Vec3<X, Y, Z>;
 
 // some other vector, maybe from a third party library we cannot change
 
