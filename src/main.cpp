@@ -72,7 +72,8 @@ int main()
 
 	for (int step = 0; step < steps; ++step)
 	{
-		const Vec3 air_relative {velocity - wind}; // Vec3 - OtherVector
+		// Vec3 - OtherVector, result is a Vec3
+		const auto air_relative {velocity - wind};
 		const float speed_squared = air_relative.length_squared();
 		if (speed_squared > 0.0f)
 		{

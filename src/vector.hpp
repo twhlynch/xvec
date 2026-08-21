@@ -45,87 +45,115 @@ concept OtherVector = !Vector<T> && VectorLike<T>;
 
 // MARK: operators macro
 
-// vec OP other, other OP vec, vec OP vec, vec OP diff vec, vec COMPOUND other,
-// vec COMPOUND vec, vec COMPOUND diff vec, other COMPOUND vec
-#define VEC_DEFINE_ARITHMETIC_OPERATORS(OP, COMPOUND)                          \
-                                                                               \
-	/* vec OP other */                                                         \
-	template <OtherVector T>                                                   \
-	[[nodiscard]] constexpr friend vector                                      \
-	operator OP(vector lhs, const T &rhs) noexcept                             \
-	{                                                                          \
-		return {                                                               \
-			static_cast<X>(lhs.x OP rhs.x),                                    \
-			static_cast<Y>(lhs.y OP rhs.y),                                    \
-			static_cast<Z>(lhs.z OP rhs.z),                                    \
-		};                                                                     \
-	}                                                                          \
-                                                                               \
-	/* other OP vec */                                                         \
-	template <OtherVector T>                                                   \
-	[[nodiscard]] constexpr friend T                                           \
-	operator OP(T lhs, const vector &rhs) noexcept                             \
-	{                                                                          \
-		return {                                                               \
-			static_cast<std::remove_cvref_t<decltype(lhs.x)>>(lhs.x OP rhs.x), \
-			static_cast<std::remove_cvref_t<decltype(lhs.y)>>(lhs.y OP rhs.y), \
-			static_cast<std::remove_cvref_t<decltype(lhs.z)>>(lhs.z OP rhs.z), \
-		};                                                                     \
-	}                                                                          \
-                                                                               \
-	/* vec OP vec (same) */                                                    \
-	[[nodiscard]] constexpr friend vector                                      \
-	operator OP(vector lhs, const vector &rhs) noexcept                        \
-	{                                                                          \
-		return {lhs.x OP rhs.x, lhs.y OP rhs.y, lhs.z OP rhs.z};               \
-	}                                                                          \
-                                                                               \
-	/* vec OP diff vec */                                                      \
-	template <Number X2, Number Y2, Number Z2>                                 \
-	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>                          \
-	operator OP(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept            \
-	{                                                                          \
-		return {                                                               \
-			static_cast<X2>(lhs.x OP rhs.x),                                   \
-			static_cast<Y2>(lhs.y OP rhs.y),                                   \
-			static_cast<Z2>(lhs.z OP rhs.z),                                   \
-		};                                                                     \
-	}                                                                          \
-                                                                               \
-	/* vec COMPOUND other */                                                   \
-	template <OtherVector T>                                                   \
-	constexpr vector &                                                         \
-	operator COMPOUND(const T &v) noexcept                                     \
-	{                                                                          \
-		this->x COMPOUND v.x;                                                  \
-		this->y COMPOUND v.y;                                                  \
-		this->z COMPOUND v.z;                                                  \
-		return *this;                                                          \
-	}                                                                          \
-                                                                               \
-	/* vec COMPOUND vec (same) */                                              \
-	constexpr friend vector &                                                  \
-	operator COMPOUND(vector &lhs, const vector &rhs) noexcept                 \
-	{                                                                          \
-		lhs.x COMPOUND rhs.x;                                                  \
-		lhs.y COMPOUND rhs.y;                                                  \
-		lhs.z COMPOUND rhs.z;                                                  \
-		return lhs;                                                            \
-	}                                                                          \
-                                                                               \
-	/* vec COMPOUND diff vec */                                                \
-	template <Number X2, Number Y2, Number Z2>                                 \
-	constexpr friend vector<X2, Y2, Z2>                                        \
-	operator COMPOUND(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept     \
-	{                                                                          \
-		lhs.x COMPOUND rhs.x;                                                  \
-		lhs.y COMPOUND rhs.y;                                                  \
-		lhs.z COMPOUND rhs.z;                                                  \
-		return {                                                               \
-			static_cast<X2>(lhs.x),                                            \
-			static_cast<Y2>(lhs.y),                                            \
-			static_cast<Z2>(lhs.z)                                             \
-		};                                                                     \
+// vec OP other, other OP vec, other OP derived vec, vec OP vec, vec OP diff
+// vec, derived vec OP vec, vec COMPOUND other, vec COMPOUND vec, vec COMPOUND
+// diff vec, other COMPOUND vec
+#define VEC_DEFINE_ARITHMETIC_OPERATORS(OP, COMPOUND)                                                                \
+                                                                                                                     \
+	/* vec OP other */                                                                                               \
+	template <Vector L, OtherVector T>                                                                               \
+		requires(std::derived_from<std::remove_cvref_t<L>, vector>)                                                  \
+	[[nodiscard]] constexpr friend std::remove_cvref_t<L>                                                            \
+	operator OP(L lhs, const T &rhs) noexcept                                                                        \
+	{                                                                                                                \
+		return {                                                                                                     \
+			static_cast<std::remove_cvref_t<decltype(lhs.x)>>(lhs.x OP rhs.x),                                       \
+			static_cast<std::remove_cvref_t<decltype(lhs.y)>>(lhs.y OP rhs.y),                                       \
+			static_cast<std::remove_cvref_t<decltype(lhs.z)>>(lhs.z OP rhs.z),                                       \
+		};                                                                                                           \
+	}                                                                                                                \
+                                                                                                                     \
+	/* other OP vec */                                                                                               \
+	template <OtherVector T>                                                                                         \
+	[[nodiscard]] constexpr friend T                                                                                 \
+	operator OP(T lhs, const vector &rhs) noexcept                                                                   \
+	{                                                                                                                \
+		return {                                                                                                     \
+			static_cast<std::remove_cvref_t<decltype(lhs.x)>>(lhs.x OP rhs.x),                                       \
+			static_cast<std::remove_cvref_t<decltype(lhs.y)>>(lhs.y OP rhs.y),                                       \
+			static_cast<std::remove_cvref_t<decltype(lhs.z)>>(lhs.z OP rhs.z),                                       \
+		};                                                                                                           \
+	}                                                                                                                \
+                                                                                                                     \
+	/* other OP derived vec */                                                                                       \
+	template <OtherVector T, Vector R>                                                                               \
+		requires(!std::same_as<std::remove_cvref_t<R>, vector> && std::derived_from<std::remove_cvref_t<R>, vector>) \
+	[[nodiscard]] constexpr friend std::remove_cvref_t<R>                                                            \
+	operator OP(T lhs, const R &rhs) noexcept                                                                        \
+	{                                                                                                                \
+		return {                                                                                                     \
+			static_cast<std::remove_cvref_t<decltype(rhs.x)>>(lhs.x OP rhs.x),                                       \
+			static_cast<std::remove_cvref_t<decltype(rhs.y)>>(lhs.y OP rhs.y),                                       \
+			static_cast<std::remove_cvref_t<decltype(rhs.z)>>(lhs.z OP rhs.z),                                       \
+		};                                                                                                           \
+	}                                                                                                                \
+                                                                                                                     \
+	/* vec OP vec (same) */                                                                                          \
+	[[nodiscard]] constexpr friend vector                                                                            \
+	operator OP(vector lhs, const vector &rhs) noexcept                                                              \
+	{                                                                                                                \
+		return {lhs.x OP rhs.x, lhs.y OP rhs.y, lhs.z OP rhs.z};                                                     \
+	}                                                                                                                \
+                                                                                                                     \
+	/* vec OP diff vec */                                                                                            \
+	template <Number X2, Number Y2, Number Z2>                                                                       \
+	[[nodiscard]] constexpr friend vector<X2, Y2, Z2>                                                                \
+	operator OP(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept                                                  \
+	{                                                                                                                \
+		return {                                                                                                     \
+			static_cast<X2>(lhs.x OP rhs.x),                                                                         \
+			static_cast<Y2>(lhs.y OP rhs.y),                                                                         \
+			static_cast<Z2>(lhs.z OP rhs.z),                                                                         \
+		};                                                                                                           \
+	}                                                                                                                \
+                                                                                                                     \
+	/* derived vec OP vec */                                                                                         \
+	template <Vector L, Vector R>                                                                                    \
+		requires(!std::same_as<std::remove_cvref_t<L>, vector> && std::derived_from<std::remove_cvref_t<L>, vector>) \
+	[[nodiscard]] constexpr friend std::remove_cvref_t<L>                                                            \
+	operator OP(L lhs, const R &rhs) noexcept                                                                        \
+	{                                                                                                                \
+		return {                                                                                                     \
+			static_cast<std::remove_cvref_t<decltype(lhs.x)>>(lhs.x OP rhs.x),                                       \
+			static_cast<std::remove_cvref_t<decltype(lhs.y)>>(lhs.y OP rhs.y),                                       \
+			static_cast<std::remove_cvref_t<decltype(lhs.z)>>(lhs.z OP rhs.z),                                       \
+		};                                                                                                           \
+	}                                                                                                                \
+                                                                                                                     \
+	/* vec COMPOUND other */                                                                                         \
+	template <OtherVector T>                                                                                         \
+	constexpr vector &                                                                                               \
+	operator COMPOUND(const T &v) noexcept                                                                           \
+	{                                                                                                                \
+		this->x COMPOUND v.x;                                                                                        \
+		this->y COMPOUND v.y;                                                                                        \
+		this->z COMPOUND v.z;                                                                                        \
+		return *this;                                                                                                \
+	}                                                                                                                \
+                                                                                                                     \
+	/* vec COMPOUND vec (same) */                                                                                    \
+	constexpr friend vector &                                                                                        \
+	operator COMPOUND(vector &lhs, const vector &rhs) noexcept                                                       \
+	{                                                                                                                \
+		lhs.x COMPOUND rhs.x;                                                                                        \
+		lhs.y COMPOUND rhs.y;                                                                                        \
+		lhs.z COMPOUND rhs.z;                                                                                        \
+		return lhs;                                                                                                  \
+	}                                                                                                                \
+                                                                                                                     \
+	/* vec COMPOUND diff vec */                                                                                      \
+	template <Number X2, Number Y2, Number Z2>                                                                       \
+	constexpr friend vector<X2, Y2, Z2>                                                                              \
+	operator COMPOUND(vector &lhs, const vector<X2, Y2, Z2> &rhs) noexcept                                           \
+	{                                                                                                                \
+		lhs.x COMPOUND rhs.x;                                                                                        \
+		lhs.y COMPOUND rhs.y;                                                                                        \
+		lhs.z COMPOUND rhs.z;                                                                                        \
+		return {                                                                                                     \
+			static_cast<X2>(lhs.x),                                                                                  \
+			static_cast<Y2>(lhs.y),                                                                                  \
+			static_cast<Z2>(lhs.z)                                                                                   \
+		};                                                                                                           \
 	}
 
 // MARK: comparison operators
