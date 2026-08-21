@@ -195,7 +195,7 @@ struct vector
 		return *this;
 	}
 
-	template <OtherVector T>
+	template <VectorLike T>
 	[[nodiscard]] constexpr
 	operator T() const noexcept
 	{ return {x, y, z}; }
