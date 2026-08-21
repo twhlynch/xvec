@@ -14,6 +14,18 @@ struct CustomVector
 	T z;
 };
 
+struct Derived;
+
+template <>
+struct xvec::is_vector<Derived> : std::true_type
+{
+};
+
+struct Derived : xvec::vector<float, float, float>
+{
+	using xvec::vector<float, float, float>::vector;
+};
+
 template <typename Expected, typename Actual>
 	requires(std::is_same_v<std::remove_cvref_t<Actual>, Expected>)
 static void is_same(Actual &&_)
@@ -49,6 +61,27 @@ inline void test()
 	is_same<xvec::vector<float, float, float>>(vector_int += vector_float);
 	is_same<xvec::vector<int, int, int>>(vector_int += vector_int);
 	is_same<xvec::vector<int, float, double>>(vector_int += vector_complex);
+
+	Derived dv {1.0f, 2.0f, 3.0f};
+
+	is_same<Derived>(dv + dv);
+	is_same<Derived>(dv - dv);
+	is_same<Derived>(dv * dv);
+	is_same<Derived>(dv / dv);
+	is_same<Derived>(dv + custom_int);
+	is_same<Derived>(custom_int + dv);
+	is_same<Derived>(dv + vector_int);
+	is_same<xvec::vector<float, float, float>>(vector_float + dv); // plain lhs keeps rhs element types
+	is_same<Derived>(dv + vector_complex);
+
+	constexpr Derived cd1 {1.0f, 2.0f, 3.0f};
+	constexpr Derived cd2 {4.0f, 5.0f, 6.0f};
+	constexpr CustomVector cd_custom {.x = 1, .y = 2, .z = 3};
+
+	static_assert(cd1 + cd2 == Derived {5.0f, 7.0f, 9.0f});
+	static_assert(cd1 + cd_custom == Derived {2.0f, 4.0f, 6.0f});
+	static_assert(cd_custom + cd1 == cd1 + cd_custom);
+	static_assert((cd1 * Derived {2.0f, 2.0f, 2.0f}) == Derived {2.0f, 4.0f, 6.0f});
 
 	is_same<xvec::vector<int, int, int>>(xvec::vector(0, 0, 0));
 	is_same<xvec::vector<double, double, double>>(xvec::vector(0.0, 0.0, 0.0));
