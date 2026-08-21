@@ -126,6 +126,40 @@ concept OtherVector = !Vector<T> && VectorLike<T>;
 		};                                                                     \
 	}
 
+// MARK: comparison operators
+
+#define VEC_DEFINE_COMPARISON(OP)                                   \
+	/* vec OP other */                                              \
+	template <OtherVector T>                                        \
+	[[nodiscard]] constexpr friend bool                             \
+	operator OP(vector lhs, const T &rhs) noexcept                  \
+	{                                                               \
+		return lhs.x OP rhs.x && lhs.y OP rhs.y && lhs.z OP rhs.z;  \
+	}                                                               \
+                                                                    \
+	/* other OP vec */                                              \
+	template <OtherVector T>                                        \
+	[[nodiscard]] constexpr friend bool                             \
+	operator OP(T lhs, const vector &rhs) noexcept                  \
+	{                                                               \
+		return lhs.x OP rhs.x && lhs.y OP rhs.y && lhs.z OP rhs.z;  \
+	}                                                               \
+                                                                    \
+	/* vec OP vec (same) */                                         \
+	[[nodiscard]] constexpr friend bool                             \
+	operator OP(vector lhs, const vector &rhs) noexcept             \
+	{                                                               \
+		return lhs.x OP rhs.x && lhs.y OP rhs.y && lhs.z OP rhs.z;  \
+	}                                                               \
+                                                                    \
+	/* vec OP diff vec */                                           \
+	template <Number X2, Number Y2, Number Z2>                      \
+	[[nodiscard]] constexpr friend bool                             \
+	operator OP(vector lhs, const vector<X2, Y2, Z2> &rhs) noexcept \
+	{                                                               \
+		return lhs.x OP rhs.x && lhs.y OP rhs.y && lhs.z OP rhs.z;  \
+	}
+
 // MARK: class
 
 template <Number X, Number Y, Number Z>
@@ -168,9 +202,23 @@ struct vector
 	VEC_DEFINE_ARITHMETIC_OPERATORS(-, -=)
 	VEC_DEFINE_ARITHMETIC_OPERATORS(*, *=)
 	VEC_DEFINE_ARITHMETIC_OPERATORS(/, /=)
+
+	VEC_DEFINE_COMPARISON(==)
+	VEC_DEFINE_COMPARISON(!=)
+	VEC_DEFINE_COMPARISON(>)
+	VEC_DEFINE_COMPARISON(<)
+	VEC_DEFINE_COMPARISON(>=)
+	VEC_DEFINE_COMPARISON(<=)
+
+	[[nodiscard]] constexpr friend bool
+	operator!(vector v) noexcept
+	{
+		return !v.x && !v.y && !v.z;
+	}
 };
 
 #undef VEC_DEFINE_ARITHMETIC_OPERATORS
+#undef VEC_DEFINE_COMPARISON
 
 // MARK: other COMPOUND vec
 
