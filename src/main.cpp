@@ -84,5 +84,22 @@ int main()
 	[[maybe_unused]] constexpr auto cv5 = static_cast<CustomVector<int>>(cv1);
 	[[maybe_unused]] constexpr auto cv6 = cc1 + cv1;
 
+	constexpr xvec::vector ceq1 {1, 2, 3};
+	constexpr xvec::vector ceq2 {1, 2, 3};
+	constexpr xvec::vector ceq3 {4, 5, 6};
+	constexpr CustomVector ceq_custom {.x = 1, .y = 2, .z = 3};
+
+	static_assert(cv1 == ceq1);
+	static_assert(!(cv1 == ceq3));
+	static_assert(cv1 != ceq3);
+	static_assert(!(cv1 != ceq2));
+	constexpr xvec::vector<float, float, float> ceq_f {1.0f, 2.0f, 3.0f};
+	static_assert(cv1 == ceq_f);
+	static_assert(!(ceq_f == ceq3));
+	static_assert(cv1 == ceq_custom);
+	static_assert(ceq_custom == cv1);
+	static_assert(!xvec::vector(0, 0, 0));
+	static_assert(!!xvec::vector(1, 0, 0));
+
 	return EXIT_SUCCESS;
 }
